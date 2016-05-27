@@ -110,12 +110,14 @@ enum sha256_algos {
 	ALGO_SCRYPT,		/* scrypt(1024,1,1) */
 	ALGO_SHA256D,		/* SHA-256d */
 	ALGO_X,
+	ALGO_X11EVO
 };
 
 static const char *algo_names[] = {
 	[ALGO_SCRYPT]		= "scrypt",
 	[ALGO_SHA256D]		= "sha256d",
 	[ALGO_X]			= "X11",
+	[ALGO_X11EVO]		= "X11EVO"
 };
 
 bool opt_hashdebug = false;
@@ -790,8 +792,12 @@ static void *miner_thread(void *userdata)
 			break;
 		
 		case ALGO_X:
-			rc = scanhash_X(thr_id, work.data, work.target,
-			                      max_nonce, &hashes_done);
+			//rc = scanhash_X(thr_id, work.data, work.target,
+			//                      max_nonce, &hashes_done);
+			break;
+		case ALGO_X11EVO:
+			rc = scanhash_X11EVO(thr_id, work.data, work.target,
+				max_nonce, &hashes_done, stratum.job.ntime);
 			break;
 		default:
 			/* should never happen */
@@ -1327,6 +1333,10 @@ int main(int argc, char *argv[])
 	printf("Launching miner...\n\n");
 		init_Xhash_contexts();
 	}
+	else if (opt_algo == ALGO_X11EVO) {
+		init_Xhash_contexts();
+	}
+
 
 	pthread_mutex_init(&applog_lock, NULL);
 	pthread_mutex_init(&stats_lock, NULL);
